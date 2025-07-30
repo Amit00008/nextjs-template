@@ -1,73 +1,250 @@
-# AI Development Rules
+# 🧠 AI Development Rules
 
-This document outlines the technology stack and specific library usage guidelines for this Next.js application. Adhering to these rules will help maintain consistency, improve collaboration, and ensure the AI assistant can effectively understand and modify the codebase.
+This document defines the tech stack, library usage patterns, architectural principles, and best practices for developing and scaling this Next.js application. By following these standards, we ensure consistency, maintainability, high performance, and a smooth developer experience across the frontend and backend codebase.
 
-## Tech Stack Overview
+---
 
-The application is built using the following core technologies:
+## 🚀 Tech Stack Overview
 
-*   **Framework**: Next.js (App Router)
-*   **Language**: TypeScript
-*   **UI Components**: Shadcn/UI - A collection of re-usable UI components built with Radix UI and Tailwind CSS.
-*   **Styling**: Tailwind CSS - A utility-first CSS framework for rapid UI development.
-*   **Icons**: Lucide React - A comprehensive library of simply beautiful SVG icons.
-*   **Forms**: React Hook Form for managing form state and validation, typically with Zod for schema validation.
-*   **State Management**: Primarily React Context API and built-in React hooks (`useState`, `useReducer`).
-*   **Notifications/Toasts**: Sonner for displaying non-intrusive notifications.
-*   **Charts**: Recharts for data visualization.
-*   **Animation**: `tailwindcss-animate` and animation capabilities built into Radix UI components.
+This project leverages a modern, scalable, and developer-friendly stack:
 
-## Library Usage Guidelines
+| Layer | Tech |
+|-------|------|
+| Framework | **Next.js (App Router)** |
+| Language | **TypeScript** |
+| Styling | **Tailwind CSS** + `tailwindcss-animate` |
+| UI Components | **Shadcn/UI** (built on Radix UI) |
+| Forms & Validation | **react-hook-form** + **zod** |
+| Icons | **Lucide React** |
+| State Management | React Hooks (`useState`, `useReducer`, Context API) |
+| Notifications | **Sonner** |
+| Charts | **Recharts** |
+| Backend API | **Next.js Route Handlers**, Server Actions |
+| Database ORM | _(Optional but recommended)_ **Drizzle ORM** |
+| Auth | _(Flexible)_ NextAuth.js / Clerk / Custom JWT |
+| File Uploads | `uploadthing`, `next-cloudinary`, or custom handlers |
+| Hosting | Vercel / Railway / Render (discuss if self-hosted) |
 
-To ensure consistency and leverage the chosen stack effectively, please follow these rules:
+---
 
-1.  **UI Components**:
-    *   **Primary Choice**: Always prioritize using components from the `src/components/ui/` directory (Shadcn/UI components).
-    *   **Custom Components**: If a required component is not available in Shadcn/UI, create a new component in `src/components/` following Shadcn/UI's composition patterns (i.e., building on Radix UI primitives and styled with Tailwind CSS).
-    *   **Avoid**: Introducing new, third-party UI component libraries without discussion.
+## 🧩 UI & Component Guidelines
 
-2.  **Styling**:
-    *   **Primary Choice**: Exclusively use Tailwind CSS utility classes for all styling.
-    *   **Global Styles**: Reserve `src/app/globals.css` for base Tailwind directives, global CSS variable definitions, and minimal base styling. Avoid adding component-specific styles here.
-    *   **CSS-in-JS**: Do not use CSS-in-JS libraries (e.g., Styled Components, Emotion).
+### 1. **Use Shadcn/UI First**
+- Use only components from `src/components/ui/` unless a component doesn’t exist.
+- Build custom components with **Radix primitives + Tailwind CSS** to match Shadcn style.
+- Avoid random third-party UI kits (e.g., MUI, Chakra) unless explicitly discussed.
 
-3.  **Icons**:
-    *   **Primary Choice**: Use icons from the `lucide-react` library.
+### 2. **Tailwind-First Styling**
+- Prefer Tailwind utility classes.
+- Avoid inline styles or `style={{}}` unless dynamically necessary.
+- No `styled-components`, Emotion, or other CSS-in-JS libs.
+- Add base resets and variables only in `src/app/globals.css`.
 
-4.  **Forms**:
-    *   **Management**: Use `react-hook-form` for all form logic (state, validation, submission).
-    *   **Validation**: Use `zod` for schema-based validation with `react-hook-form` via `@hookform/resolvers`.
+---
 
-5.  **State Management**:
-    *   **Local State**: Use React's `useState` and `useReducer` hooks for component-level state.
-    *   **Shared/Global State**: For state shared between multiple components, prefer React Context API.
-    *   **Complex Global State**: If application state becomes significantly complex, discuss the potential introduction of a dedicated state management library (e.g., Zustand, Jotai) before implementing.
+## 📦 Icon System
 
-6.  **Routing**:
-    *   Utilize the Next.js App Router (file-system based routing in the `src/app/` directory).
+- All icons must come from [`lucide-react`](https://lucide.dev/).
+- Wrap icons in components if reused frequently.
 
-7.  **API Calls & Data Fetching**:
-    *   **Client-Side**: Use the native `fetch` API or a simple wrapper around it.
-    *   **Server-Side (Next.js)**: Leverage Next.js Route Handlers (in `src/app/api/`) or Server Actions for server-side logic and data fetching.
+---
 
-8.  **Animations**:
-    *   Use `tailwindcss-animate` plugin and the animation utilities provided by Radix UI components.
+## 📝 Forms & Validation
 
-9.  **Notifications/Toasts**:
-    *   Use the `Sonner` component (from `src/components/ui/sonner.tsx`) for all toast notifications.
+### Use:
+- `react-hook-form` for form state management.
+- `zod` for schema validation and TypeScript inference.
+- `@hookform/resolvers/zod` to bind validation.
 
-10. **Charts & Data Visualization**:
-    *   Use `recharts` and its associated components (e.g., `src/components/ui/chart.tsx`) for displaying charts.
+### Structure:
+```
+src/components/forms/
+src/lib/validations/[entity].ts
+```
 
-11. **Utility Functions**:
-    *   General-purpose helper functions should be placed in `src/lib/utils.ts`.
-    *   Ensure functions are well-typed and serve a clear, reusable purpose.
+---
 
-12. **Custom Hooks**:
-    *   Custom React hooks should be placed in the `src/hooks/` directory (e.g., `src/hooks/use-mobile.tsx`).
+## 🧠 State Management Rules
 
-13. **TypeScript**:
-    *   Write all new code in TypeScript.
-    *   Strive for strong typing and leverage TypeScript's features to improve code quality and maintainability. Avoid using `any` where possible.
+| Scope | Tool |
+|-------|------|
+| Local component | `useState`, `useReducer` |
+| Shared across components | `Context API` |
+| App-wide complex state | ✅ *Discuss first:* Zustand, Jotai, or Redux Toolkit |
 
-By following these guidelines, we can build a more robust, maintainable, and consistent application.
+Avoid unnecessary global state bloat.
+
+---
+
+## 🧭 Routing & Navigation
+
+- Use **Next.js App Router** (`src/app/`) exclusively.
+- Organize routes clearly with layout files (`layout.tsx`, `page.tsx`).
+- Dynamic routes: `app/products/[id]/page.tsx` etc.
+- Use `redirect`, `notFound`, and `generateStaticParams` for clean routing.
+
+---
+
+## 🧪 API Development Rules
+
+### Server Logic Options:
+| Method | Use When |
+|--------|----------|
+| **Route Handlers** (`src/app/api/**/route.ts`) | Classic REST-style APIs |
+| **Server Actions** (with `use server`) | Form submissions, mutations, SSR logic |
+
+### Best Practices:
+- ✅ Keep route handlers **thin** – delegate logic to `src/lib/api/` or `src/server/services/`.
+- ✅ Validate request payloads with `zod`.
+- ✅ Use `Response.json()` with proper HTTP status codes.
+- ✅ Sanitize input/output for security.
+- ❌ Never mix business logic directly in route files.
+
+### Suggested Structure:
+```
+src/app/api/
+├── auth/
+│   └── login/route.ts
+│
+src/server/
+├── services/         # Business logic lives here
+├── db/               # Database access (Drizzle/Prisma)
+├── utils/            # Shared utilities
+```
+
+---
+
+## 🔐 Authentication & Authorization
+
+- Prefer **NextAuth.js** for session management.
+- For edge use cases, use JWT + middleware.
+- Auth routes live under `api/auth/**`.
+
+Example middleware for protected routes:
+```ts
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get("token");
+  if (!token) return NextResponse.redirect("/login");
+  return NextResponse.next();
+}
+```
+
+---
+
+## ☁️ API Calls & Data Fetching
+
+| Type | Use |
+|------|-----|
+| Client-side | `fetch` or SWR (for revalidation) |
+| Server-side | `fetch`, `cache()`, Server Actions |
+| Mutations | Server Actions preferred |
+
+### Rules:
+- Avoid axios — native `fetch` is preferred.
+- Use `revalidatePath()` or `revalidateTag()` when mutating cached data.
+- Avoid `getServerSideProps` or `getStaticProps` (legacy features).
+
+---
+
+## 📊 Charts
+
+- Use **Recharts** only.
+- Create reusable chart wrappers in `src/components/ui/chart.tsx`.
+
+---
+
+## 🔔 Toasts & Feedback
+
+- Use **Sonner** (from `src/components/ui/sonner.tsx`).
+- Keep toast copy concise and actionable.
+
+---
+
+## 🧪 Directory Structure Standards
+
+```
+src/
+├── app/               # App Router pages, layouts, etc.
+├── components/
+│   ├── ui/            # Shadcn/UI components
+│   └── [feature]/     # Feature-specific components
+├── hooks/             # Custom React hooks
+├── lib/
+│   ├── utils.ts       # Helper functions
+│   ├── validations/   # Zod schemas
+│   └── api/           # API wrappers or logic
+├── server/
+│   ├── db/            # DB layer (Drizzle / Prisma)
+│   ├── services/      # Business logic
+│   └── auth/          # Auth helpers
+└── types/             # Global TypeScript types
+```
+
+---
+
+## 🧰 Utility Functions
+
+- All general-purpose utils live in `src/lib/utils.ts`.
+- Must be:
+  - Strongly typed
+  - Reusable across the app
+  - Accompanied by meaningful names and JSDoc comments
+
+---
+
+## 🪝 Custom Hooks
+
+- All custom hooks live in `src/hooks/`.
+- Use `use-` prefix and descriptive names (e.g., `use-mobile.ts`, `use-auth.ts`).
+- Keep them lean and scoped.
+
+---
+
+## 🔡 TypeScript Rules
+
+- Write **everything** in TypeScript.
+- Avoid `any`. Prefer `unknown` with type guards.
+- Use `z.infer<typeof schema>` to mirror schema types.
+- Use `readonly`, `as const`, and type aliases where needed.
+
+---
+
+## 🧙🏽‍♂️ Pro Tips
+
+- Use `strict mode` in `tsconfig.json`.
+- Prefer composition over inheritance.
+- Keep API responses consistent: always `{ success, data, error }`.
+- Use `env.ts` to safely access `process.env`.
+- Auto-format with `prettier` + `eslint` on save.
+
+---
+
+## 🛡️ Security Guidelines
+
+- Validate all external input using Zod.
+- Sanitize HTML content if rendering rich text.
+- Never trust `req.body` blindly.
+- Store secrets in `.env.local` (never commit it!).
+
+---
+
+## 🧼 Linting & Formatting
+
+- Run `pnpm lint` and `pnpm format` before pushing.
+- Enable auto-format on save in VSCode.
+- Follow the `.eslintrc` and `.prettierrc` configs strictly.
+
+---
+
+## ✅ Checklist Before Merge
+
+- [ ] ✅ All new components use Shadcn/UI
+- [ ] ✅ Types are strict, no `any`
+- [ ] ✅ API logic moved to service layer
+- [ ] ✅ Zod validation added
+- [ ] ✅ Lint and format pass
+- [ ] ✅ Minimal diff in unrelated files
+
+---
+
+This doc is your bestie. Stick to it like tailwind to a `div`, and we’ll keep the codebase slick, scalable, and AI-friendly.
